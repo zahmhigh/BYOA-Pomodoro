@@ -11,6 +11,7 @@ class PomodoroTimer {
         
         this.initializeElements();
         this.bindEvents();
+        this.syncTimerWithInputs();
         this.updateDisplay();
     }
 
@@ -68,15 +69,19 @@ class PomodoroTimer {
             }
         });
         
-        // Time input events
-        this.focusTimeInput.addEventListener('change', () => this.updateTimeFromInput('focus'));
-        this.shortBreakTimeInput.addEventListener('change', () => this.updateTimeFromInput('short-break'));
-        this.longBreakTimeInput.addEventListener('change', () => this.updateTimeFromInput('long-break'));
-        
-        // Update mode button data-time when input changes
-        this.focusTimeInput.addEventListener('input', () => this.updateModeButtonTime('focus'));
-        this.shortBreakTimeInput.addEventListener('input', () => this.updateModeButtonTime('short-break'));
-        this.longBreakTimeInput.addEventListener('input', () => this.updateModeButtonTime('long-break'));
+        // Time input events - use 'input' for immediate response
+        this.focusTimeInput.addEventListener('input', () => {
+            this.updateModeButtonTime('focus');
+            this.updateTimeFromInput('focus');
+        });
+        this.shortBreakTimeInput.addEventListener('input', () => {
+            this.updateModeButtonTime('short-break');
+            this.updateTimeFromInput('short-break');
+        });
+        this.longBreakTimeInput.addEventListener('input', () => {
+            this.updateModeButtonTime('long-break');
+            this.updateTimeFromInput('long-break');
+        });
     }
 
     start() {
@@ -310,8 +315,8 @@ class PomodoroTimer {
     updateTimeFromInput(mode) {
         const newTime = this.getTimeFromInput(mode) * 60;
         
-        // Only update if this is the current mode
-        if (this.currentMode === mode) {
+        // Update if this is the current mode and timer is not running
+        if (this.currentMode === mode && !this.isRunning) {
             this.totalTime = newTime;
             this.timeLeft = newTime;
             this.updateDisplay();
@@ -326,6 +331,18 @@ class PomodoroTimer {
         if (btn) {
             btn.dataset.time = newTime;
         }
+    }
+    
+    syncTimerWithInputs() {
+        // Initialize timer with current input values
+        const currentTime = this.getTimeFromInput(this.currentMode) * 60;
+        this.totalTime = currentTime;
+        this.timeLeft = currentTime;
+        
+        // Update all mode button data-time attributes
+        this.updateModeButtonTime('focus');
+        this.updateModeButtonTime('short-break');
+        this.updateModeButtonTime('long-break');
     }
 }
 
