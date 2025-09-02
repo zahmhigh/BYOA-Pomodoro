@@ -7,6 +7,7 @@ class PomodoroTimer {
         this.sessions = 0;
         this.totalMinutes = 0;
         this.currentMode = 'focus';
+        this.currentFocus = '';
         
         this.initializeElements();
         this.bindEvents();
@@ -25,6 +26,14 @@ class PomodoroTimer {
         this.notification = document.getElementById('notification');
         this.notificationText = document.getElementById('notification-text');
         this.notificationClose = document.getElementById('notification-close');
+        
+        // Focus elements
+        this.focusDisplay = document.getElementById('focus-display');
+        this.focusText = document.getElementById('focus-text');
+        this.focusModal = document.getElementById('focus-modal');
+        this.focusInput = document.getElementById('focus-input');
+        this.focusCancel = document.getElementById('focus-cancel');
+        this.focusConfirm = document.getElementById('focus-confirm');
     }
 
     bindEvents() {
@@ -37,23 +46,48 @@ class PomodoroTimer {
         });
 
         this.notificationClose.addEventListener('click', () => this.hideNotification());
+        
+        // Focus modal events
+        this.focusCancel.addEventListener('click', () => this.hideFocusModal());
+        this.focusConfirm.addEventListener('click', () => this.confirmFocus());
+        this.focusInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.confirmFocus();
+            }
+        });
+        
+        // Close modal when clicking outside
+        this.focusModal.addEventListener('click', (e) => {
+            if (e.target === this.focusModal) {
+                this.hideFocusModal();
+            }
+        });
     }
 
     start() {
         if (!this.isRunning) {
-            this.isRunning = true;
-            this.startBtn.disabled = true;
-            this.pauseBtn.disabled = false;
-            
-            this.interval = setInterval(() => {
-                this.timeLeft--;
-                this.updateDisplay();
-                
-                if (this.timeLeft <= 0) {
-                    this.complete();
-                }
-            }, 1000);
+            // Show focus modal only for focus mode
+            if (this.currentMode === 'focus') {
+                this.showFocusModal();
+            } else {
+                this.startTimer();
+            }
         }
+    }
+    
+    startTimer() {
+        this.isRunning = true;
+        this.startBtn.disabled = true;
+        this.pauseBtn.disabled = false;
+        
+        this.interval = setInterval(() => {
+            this.timeLeft--;
+            this.updateDisplay();
+            
+            if (this.timeLeft <= 0) {
+                this.complete();
+            }
+        }, 1000);
     }
 
     pause() {
@@ -68,6 +102,8 @@ class PomodoroTimer {
     reset() {
         this.pause();
         this.timeLeft = this.totalTime;
+        this.currentFocus = '';
+        this.hideFocusDisplay();
         this.updateDisplay();
     }
 
@@ -86,6 +122,10 @@ class PomodoroTimer {
         this.totalTime = newTime;
         this.timeLeft = newTime;
         this.currentMode = newMode;
+        
+        // Clear focus when switching modes
+        this.currentFocus = '';
+        this.hideFocusDisplay();
         
         // Update label
         this.updateTimerLabel();
@@ -183,6 +223,41 @@ class PomodoroTimer {
     updateStats() {
         this.sessionsDisplay.textContent = this.sessions;
         this.totalTimeDisplay.textContent = `${Math.round(this.totalMinutes)}m`;
+    }
+    
+    showFocusModal() {
+        this.focusModal.classList.add('show');
+        this.focusInput.value = '';
+        this.focusInput.focus();
+    }
+    
+    hideFocusModal() {
+        this.focusModal.classList.remove('show');
+    }
+    
+    confirmFocus() {
+        const focusText = this.focusInput.value.trim();
+        if (focusText) {
+            this.currentFocus = focusText;
+            this.showFocusDisplay();
+            this.hideFocusModal();
+            this.startTimer();
+        } else {
+            // If no focus text, start timer anyway
+            this.hideFocusModal();
+            this.startTimer();
+        }
+    }
+    
+    showFocusDisplay() {
+        if (this.currentFocus && this.currentMode === 'focus') {
+            this.focusText.textContent = this.currentFocus;
+            this.focusDisplay.style.display = 'block';
+        }
+    }
+    
+    hideFocusDisplay() {
+        this.focusDisplay.style.display = 'none';
     }
 }
 

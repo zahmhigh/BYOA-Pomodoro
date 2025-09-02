@@ -16,6 +16,10 @@
 
         <main>
             <div class="timer-card">
+                <div class="focus-display" id="focus-display" style="display: none;">
+                    <div class="focus-label">Focusing on:</div>
+                    <div class="focus-text" id="focus-text"></div>
+                </div>
                 <div class="timer-display">
                     <div class="time" id="time">25:00</div>
                     <div class="timer-label" id="timer-label">Focus Time</div>
@@ -50,6 +54,18 @@
             <div class="notification-content">
                 <span id="notification-text"></span>
                 <button class="notification-close" id="notification-close">×</button>
+            </div>
+        </div>
+
+        <!-- Focus Input Modal -->
+        <div class="modal-overlay" id="focus-modal">
+            <div class="modal-content">
+                <h3>What are you focusing on?</h3>
+                <input type="text" id="focus-input" placeholder="Enter your focus for this session..." maxlength="100">
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" id="focus-cancel">Cancel</button>
+                    <button class="btn btn-primary" id="focus-confirm">Start Focus</button>
+                </div>
             </div>
         </div>
     </div>
