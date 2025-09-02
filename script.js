@@ -34,6 +34,11 @@ class PomodoroTimer {
         this.focusInput = document.getElementById('focus-input');
         this.focusCancel = document.getElementById('focus-cancel');
         this.focusConfirm = document.getElementById('focus-confirm');
+        
+        // Time input elements
+        this.focusTimeInput = document.getElementById('focus-time');
+        this.shortBreakTimeInput = document.getElementById('short-break-time');
+        this.longBreakTimeInput = document.getElementById('long-break-time');
     }
 
     bindEvents() {
@@ -62,6 +67,16 @@ class PomodoroTimer {
                 this.hideFocusModal();
             }
         });
+        
+        // Time input events
+        this.focusTimeInput.addEventListener('change', () => this.updateTimeFromInput('focus'));
+        this.shortBreakTimeInput.addEventListener('change', () => this.updateTimeFromInput('short-break'));
+        this.longBreakTimeInput.addEventListener('change', () => this.updateTimeFromInput('long-break'));
+        
+        // Update mode button data-time when input changes
+        this.focusTimeInput.addEventListener('input', () => this.updateModeButtonTime('focus'));
+        this.shortBreakTimeInput.addEventListener('input', () => this.updateModeButtonTime('short-break'));
+        this.longBreakTimeInput.addEventListener('input', () => this.updateModeButtonTime('long-break'));
     }
 
     start() {
@@ -114,9 +129,9 @@ class PomodoroTimer {
         // Add active class to clicked button
         btn.classList.add('active');
         
-        // Get new time and mode
-        const newTime = parseInt(btn.dataset.time) * 60;
+        // Get new time and mode from the input field (not the button)
         const newMode = btn.dataset.mode;
+        const newTime = this.getTimeFromInput(newMode) * 60;
         
         // Update timer state
         this.totalTime = newTime;
@@ -258,6 +273,59 @@ class PomodoroTimer {
     
     hideFocusDisplay() {
         this.focusDisplay.style.display = 'none';
+    }
+    
+    getTimeFromInput(mode) {
+        let input;
+        switch(mode) {
+            case 'focus':
+                input = this.focusTimeInput;
+                break;
+            case 'short-break':
+                input = this.shortBreakTimeInput;
+                break;
+            case 'long-break':
+                input = this.longBreakTimeInput;
+                break;
+            default:
+                return 25;
+        }
+        
+        const value = parseInt(input.value);
+        const min = parseInt(input.min);
+        const max = parseInt(input.max);
+        
+        // Validate and clamp the value
+        if (isNaN(value) || value < min) {
+            input.value = min;
+            return min;
+        } else if (value > max) {
+            input.value = max;
+            return max;
+        }
+        
+        return value;
+    }
+    
+    updateTimeFromInput(mode) {
+        const newTime = this.getTimeFromInput(mode) * 60;
+        
+        // Only update if this is the current mode
+        if (this.currentMode === mode) {
+            this.totalTime = newTime;
+            this.timeLeft = newTime;
+            this.updateDisplay();
+        }
+    }
+    
+    updateModeButtonTime(mode) {
+        const newTime = this.getTimeFromInput(mode);
+        
+        // Update the corresponding mode button's data-time attribute
+        const btn = document.querySelector(`[data-mode="${mode}"]`);
+        if (btn) {
+            btn.dataset.time = newTime;
+        }
     }
 }
 

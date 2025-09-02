@@ -32,9 +32,27 @@
                 </div>
 
                 <div class="timer-modes">
-                    <button class="mode-btn active" data-time="25" data-mode="focus">Focus</button>
-                    <button class="mode-btn" data-time="5" data-mode="short-break">Short Break</button>
-                    <button class="mode-btn" data-time="10" data-mode="long-break">Long Break</button>
+                    <div class="mode-group">
+                        <button class="mode-btn active" data-time="25" data-mode="focus">Focus</button>
+                        <div class="time-input-group">
+                            <input type="number" class="time-input" id="focus-time" value="25" min="1" max="60">
+                            <span class="time-unit">min</span>
+                        </div>
+                    </div>
+                    <div class="mode-group">
+                        <button class="mode-btn" data-time="5" data-mode="short-break">Short Break</button>
+                        <div class="time-input-group">
+                            <input type="number" class="time-input" id="short-break-time" value="5" min="1" max="30">
+                            <span class="time-unit">min</span>
+                        </div>
+                    </div>
+                    <div class="mode-group">
+                        <button class="mode-btn" data-time="10" data-mode="long-break">Long Break</button>
+                        <div class="time-input-group">
+                            <input type="number" class="time-input" id="long-break-time" value="10" min="1" max="60">
+                            <span class="time-unit">min</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
